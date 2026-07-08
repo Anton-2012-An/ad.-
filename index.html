@@ -128,6 +128,17 @@
             border-color: #a14f4f;
         }
 
+        .btn-purple {
+            border-color: #9b59b6;
+            color: #8e44ad;
+            background: transparent;
+        }
+        .btn-purple:hover {
+            background: #9b59b6;
+            color: white;
+            border-color: #9b59b6;
+        }
+
         .section-title {
             font-size: 1.6rem;
             font-weight: 300;
@@ -283,7 +294,7 @@
             margin-bottom: 4px;
         }
 
-        .form-group input, .form-group select {
+        .form-group input, .form-group select, .form-group textarea {
             width: 100%;
             padding: 0.8rem 1rem;
             border: 1px solid #e2e8f0;
@@ -294,7 +305,12 @@
             font-family: inherit;
         }
 
-        .form-group input:focus, .form-group select:focus {
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
             outline: none;
             border-color: #d4af37;
             background: white;
@@ -357,6 +373,15 @@
             font-weight: 500;
         }
 
+        .badge-telegram {
+            background: #8e44ad;
+            color: white;
+            font-size: 0.65rem;
+            padding: 0.1rem 0.7rem;
+            border-radius: 30px;
+            margin-left: 8px;
+        }
+
         @media (max-width: 600px) {
             body { padding: 1.2rem; }
             .modal { padding: 2rem 1.5rem; }
@@ -375,8 +400,9 @@
 
     <div class="actions-grid">
         <button class="btn btn-primary" id="btnOrder">📦 Заказать</button>
-        <button class="btn btn-outline-gold" id="btnSend">✉️ Отправить</button>
-        <button class="btn" id="btnTrack">📍 Отследить посылку</button>
+        <button class="btn btn-outline-gold" id="btnSendParcel">📦 Отправить посылку</button>
+        <button class="btn btn-purple" id="btnSendTelegram">✉️ Отправить телеграмму</button>
+        <button class="btn" id="btnTrack">📍 Отследить</button>
         <button class="btn" id="btnAgreement">📄 Соглашение</button>
         <button class="btn btn-danger btn-sm" id="btnCancelOrder">↩️ Отменить заказ</button>
         <button class="btn btn-danger btn-sm" id="btnCancelSend">↩️ Отменить отправку</button>
@@ -387,7 +413,7 @@
         <div class="empty-state">Нет активных заказов</div>
     </div>
 
-    <h2 class="section-title">Отправленные письма и посылки</h2>
+    <h2 class="section-title">Отправления</h2>
     <div id="shipmentsContainer" class="shipments-grid">
         <div class="empty-state">Нет отправлений</div>
     </div>
@@ -422,12 +448,12 @@
     </div>
 </div>
 
-<!-- МОДАЛКА ОТПРАВКИ -->
-<div id="sendModal" class="modal-overlay">
+<!-- МОДАЛКА ОТПРАВКИ ПОСЫЛКИ -->
+<div id="sendParcelModal" class="modal-overlay">
     <div class="modal">
-        <button class="modal-close" id="closeSendModal">&times;</button>
-        <h2>Отправление письма / посылки</h2>
-        <form id="sendForm">
+        <button class="modal-close" id="closeSendParcelModal">&times;</button>
+        <h2>📦 Отправление посылки</h2>
+        <form id="sendParcelForm">
             <div class="form-group">
                 <label>ФИО отправителя</label>
                 <input type="text" id="senderFio" placeholder="Петров Пётр Петрович" required>
@@ -455,7 +481,30 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn-submit">📤 Отправить</button>
+            <button type="submit" class="btn-submit">📤 Отправить посылку</button>
+        </form>
+    </div>
+</div>
+
+<!-- МОДАЛКА ОТПРАВКИ ТЕЛЕГРАММЫ -->
+<div id="sendTelegramModal" class="modal-overlay">
+    <div class="modal">
+        <button class="modal-close" id="closeSendTelegramModal">&times;</button>
+        <h2>✉️ Отправление телеграммы</h2>
+        <form id="sendTelegramForm">
+            <div class="form-group">
+                <label>ФИО отправителя</label>
+                <input type="text" id="telegramSender" placeholder="Петров Пётр Петрович" required>
+            </div>
+            <div class="form-group">
+                <label>ФИО получателя</label>
+                <input type="text" id="telegramReceiver" placeholder="Сидорова Анна Викторовна" required>
+            </div>
+            <div class="form-group">
+                <label>Текст телеграммы</label>
+                <textarea id="telegramText" placeholder="Введите текст сообщения..." required></textarea>
+            </div>
+            <button type="submit" class="btn-submit">📤 Отправить телеграмму</button>
         </form>
     </div>
 </div>
@@ -464,7 +513,6 @@
     (function() {
         'use strict';
 
-        // ВИДЫ ТОВАРОВ (БЕЗ КОСТЮМОВ)
         const VARIANT_MAP = {
             'одежда': ['Футболка', 'Джинсы', 'Платье', 'Куртка', 'Пальто', 'Свитер', 'Брюки', 'Юбка', 'Рубашка', 'Шорты', 'Обувь', 'Головной убор'],
             'игрушки': ['Мягкая игрушка', 'Конструктор', 'Кукла', 'Машинка', 'Настольная игра', 'Робот', 'Пазл', 'Железная дорога', 'Плюшевый мишка', 'Кубики'],
@@ -546,6 +594,8 @@
             container.innerHTML = shipments.map((s, idx) => {
                 const statusClass = `status-${s.status}`;
                 let actionsHtml = '';
+                let typeLabel = s.isTelegram ? '✉️ Телеграмма' : '📦 Посылка';
+                
                 if (s.status === 'new') {
                     actionsHtml = `<button class="btn btn-sm btn-outline-gold" data-action="shipSend" data-idx="${idx}">🚚 Отправить получателю</button>`;
                 } else if (s.status === 'shipped') {
@@ -553,15 +603,26 @@
                 } else {
                     actionsHtml = `<span style="font-size:0.8rem; color:#8b97a8;">Доставлено</span>`;
                 }
+
+                let detailsHtml = '';
+                if (s.isTelegram) {
+                    detailsHtml = `<div class="order-detail"><strong>Текст:</strong> ${s.text}</div>`;
+                } else {
+                    detailsHtml = `
+                        <div class="order-detail"><strong>Тип:</strong> ${s.type}</div>
+                        <div class="order-detail"><strong>Вид:</strong> ${s.variant}</div>
+                    `;
+                }
+
                 return `<div class="shipment-card">
                     <div class="shipment-header">
                         <span class="shipment-number">${s.number}</span>
                         <span class="shipment-status ${statusClass}">${translateStatus(s.status)}</span>
                     </div>
-                    <div class="order-detail"><strong>Отправитель:</strong> ${s.sender}</div>
+                    <div class="order-detail"><strong>${s.isTelegram ? 'Отправитель' : 'Отправитель'}:</strong> ${s.sender}</div>
                     <div class="order-detail"><strong>Получатель:</strong> ${s.receiver}</div>
-                    <div class="order-detail"><strong>Тип:</strong> ${s.type}</div>
-                    <div class="order-detail"><strong>Вид:</strong> ${s.variant}</div>
+                    <div class="order-detail"><strong>Тип:</strong> ${typeLabel}</div>
+                    ${detailsHtml}
                     <div class="order-actions">${actionsHtml}</div>
                 </div>`;
             }).join('');
@@ -592,9 +653,9 @@
         }
 
         let toastTimer = null;
-        function showToast(number) {
+        function showToast(number, type = 'заказа') {
             const el = document.getElementById('toast');
-            el.innerHTML = `🔔 Номер заказа: <strong>${number}</strong>`;
+            el.innerHTML = `🔔 Номер ${type}: <strong>${number}</strong>`;
             el.classList.add('show');
             clearTimeout(toastTimer);
             toastTimer = setTimeout(() => {
@@ -623,18 +684,28 @@
 
         document.addEventListener('DOMContentLoaded', function() {
 
+            // Модалка заказа
             document.getElementById('btnOrder').addEventListener('click', () => openModal('orderModal'));
             document.getElementById('closeOrderModal').addEventListener('click', () => closeModal('orderModal'));
             document.getElementById('orderModal').addEventListener('click', function(e) {
                 if (e.target === this) closeModal('orderModal');
             });
 
-            document.getElementById('btnSend').addEventListener('click', () => openModal('sendModal'));
-            document.getElementById('closeSendModal').addEventListener('click', () => closeModal('sendModal'));
-            document.getElementById('sendModal').addEventListener('click', function(e) {
-                if (e.target === this) closeModal('sendModal');
+            // Модалка отправки посылки
+            document.getElementById('btnSendParcel').addEventListener('click', () => openModal('sendParcelModal'));
+            document.getElementById('closeSendParcelModal').addEventListener('click', () => closeModal('sendParcelModal'));
+            document.getElementById('sendParcelModal').addEventListener('click', function(e) {
+                if (e.target === this) closeModal('sendParcelModal');
             });
 
+            // Модалка отправки телеграммы
+            document.getElementById('btnSendTelegram').addEventListener('click', () => openModal('sendTelegramModal'));
+            document.getElementById('closeSendTelegramModal').addEventListener('click', () => closeModal('sendTelegramModal'));
+            document.getElementById('sendTelegramModal').addEventListener('click', function(e) {
+                if (e.target === this) closeModal('sendTelegramModal');
+            });
+
+            // Форма заказа
             document.getElementById('orderForm').addEventListener('submit', function(e) {
                 e.preventDefault();
                 const fio = document.getElementById('orderFio').value.trim();
@@ -655,13 +726,14 @@
                     status: 'new'
                 });
 
-                showToast(number);
+                showToast(number, 'заказа');
                 renderAll();
                 this.reset();
                 closeModal('orderModal');
             });
 
-            document.getElementById('sendForm').addEventListener('submit', function(e) {
+            // Форма отправки посылки
+            document.getElementById('sendParcelForm').addEventListener('submit', function(e) {
                 e.preventDefault();
                 const sender = document.getElementById('senderFio').value.trim();
                 const receiver = document.getElementById('receiverFio').value.trim();
@@ -678,25 +750,54 @@
                     type,
                     variant,
                     number,
-                    status: 'new'
+                    status: 'new',
+                    isTelegram: false
                 });
 
-                showToast(number);
+                showToast(number, 'посылки');
                 renderAll();
                 this.reset();
-                closeModal('sendModal');
+                closeModal('sendParcelModal');
                 populateVariants();
             });
 
+            // Форма отправки телеграммы
+            document.getElementById('sendTelegramForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const sender = document.getElementById('telegramSender').value.trim();
+                const receiver = document.getElementById('telegramReceiver').value.trim();
+                const text = document.getElementById('telegramText').value.trim();
+
+                if (!sender || !receiver || !text) return alert('Заполните все поля');
+
+                const number = generateNumber('TГ');
+                shipments.push({
+                    id: Date.now(),
+                    sender,
+                    receiver,
+                    text,
+                    number,
+                    status: 'new',
+                    isTelegram: true
+                });
+
+                showToast(number, 'телеграммы');
+                renderAll();
+                this.reset();
+                closeModal('sendTelegramModal');
+            });
+
+            // Отслеживание
             document.getElementById('btnTrack').addEventListener('click', function() {
                 const lastOrder = orders.length ? orders[orders.length-1] : null;
                 const lastShip = shipments.length ? shipments[shipments.length-1] : null;
-                let msg = '📍 Отслеживание посылки\n\n';
+                let msg = '📍 Отслеживание\n\n';
                 if (lastOrder) {
                     msg += `Последний заказ: ${lastOrder.number} — статус: ${translateStatus(lastOrder.status)}\n`;
                 }
                 if (lastShip) {
-                    msg += `Последнее отправление: ${lastShip.number} — статус: ${translateStatus(lastShip.status)}\n`;
+                    const type = lastShip.isTelegram ? 'Телеграмма' : 'Посылка';
+                    msg += `Последнее отправление (${type}): ${lastShip.number} — статус: ${translateStatus(lastShip.status)}\n`;
                 }
                 if (!lastOrder && !lastShip) {
                     msg += 'Нет активных отправлений.';
@@ -704,6 +805,7 @@
                 alert(msg);
             });
 
+            // Соглашение
             document.getElementById('btnAgreement').addEventListener('click', function() {
                 alert(
                     '📄 СОГЛАШЕНИЕ AD.ПОЧТА\n\n' +
@@ -724,6 +826,7 @@
                 );
             });
 
+            // Отмена заказа
             document.getElementById('btnCancelOrder').addEventListener('click', function() {
                 if (!orders.length) return alert('Нет заказов для отмены.');
                 const last = orders[orders.length-1];
@@ -733,6 +836,7 @@
                 alert('Последний заказ отменён.');
             });
 
+            // Отмена отправки
             document.getElementById('btnCancelSend').addEventListener('click', function() {
                 if (!shipments.length) return alert('Нет отправлений для отмены.');
                 const last = shipments[shipments.length-1];
