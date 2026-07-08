@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AD. Почта — Премиум доставка</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f9fafc;
+            color: #1a1a1e;
+            line-height: 1.5;
+            padding: 2rem 1.5rem;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        h1, h2, h3 {
+            font-weight: 400;
+        }
+
+        .logo {
+            font-size: 2.2rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+            border-bottom: 1px solid #d4af37;
+            display: inline-block;
+            padding-bottom: 6px;
+            margin-bottom: 2.5rem;
+            color: #1a1a1e;
+        }
+
+        .logo span {
+            color: #b8962e;
+            font-weight: 400;
+        }
+
+        .premium-badge {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #b8962e;
+            background: rgba(212, 175, 55, 0.08);
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            display: inline-block;
+            margin-left: 12px;
+            vertical-align: middle;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .actions-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 2.5rem 0 3rem 0;
+            border-bottom: 1px solid #eaeef3;
+            padding-bottom: 2rem;
+        }
+
+        .btn {
+            background: transparent;
+            border: 1px solid #d0d7e2;
+            padding: 0.7rem 1.8rem;
+            border-radius: 60px;
+            font-size: 0.95rem;
+            font-weight: 450;
+            color: #1f2937;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            letter-spacing: 0.3px;
+        }
+
+        .btn:hover {
+            border-color: #b8962e;
+            color: #b8962e;
+            box-shadow: 0 8px 20px rgba(184, 150, 46, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: #1a1a1e;
+            border-color: #1a1a1e;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #b8962e;
+            border-color: #b8962e;
+            color: white;
+            box-shadow: 0 8px 24px rgba(184, 150, 46, 0.25);
+        }
+
+        .btn-outline-gold {
+            border-color: #d4af37;
+            color: #b8962e;
+            background: transparent;
+        }
+
+        .btn-outline-gold:hover {
+            background: #d4af37;
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 0.35rem 1.2rem;
+            font-size: 0.8rem;
+        }
+
+        .btn-danger {
+            border-color: #e5b3b3;
+            color: #a14f4f;
+        }
+        .btn-danger:hover {
+            background: #a14f4f;
+            color: white;
+            border-color: #a14f4f;
+        }
+
+        .section-title {
+            font-size: 1.6rem;
+            font-weight: 300;
+            margin: 2.5rem 0 1.5rem 0;
+            letter-spacing: -0.3px;
+            border-left: 4px solid #d4af37;
+            padding-left: 1.2rem;
+        }
+
+        .orders-grid, .shipments-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.8rem;
+        }
+
+        .order-card, .shipment-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.6rem 1.8rem;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.04);
+            border: 1px solid #f0f3f8;
+            transition: all 0.2s;
+        }
+
+        .order-card:hover, .shipment-card:hover {
+            border-color: #d4af37;
+            box-shadow: 0 20px 40px -14px rgba(184, 150, 46, 0.12);
+        }
+
+        .order-header, .shipment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            border-bottom: 1px dashed #eef2f7;
+            padding-bottom: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .order-number, .shipment-number {
+            font-weight: 500;
+            font-size: 1.1rem;
+            color: #b8962e;
+            letter-spacing: 0.5px;
+        }
+
+        .order-status, .shipment-status {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0.2rem 0.9rem;
+            border-radius: 40px;
+            background: #f0f3f8;
+            color: #4b5563;
+        }
+
+        .status-new { background: #e6f0ff; color: #1a4f8b; }
+        .status-collected { background: #fff4e0; color: #a86f1a; }
+        .status-shipped { background: #e6f7ed; color: #0f6e4a; }
+        .status-delivered { background: #f0f0f0; color: #5b5b5b; }
+
+        .order-detail {
+            font-size: 0.92rem;
+            margin: 0.5rem 0;
+            color: #2d3748;
+        }
+
+        .order-detail strong {
+            font-weight: 500;
+            color: #1a1a1e;
+        }
+
+        .order-actions, .shipment-actions {
+            margin-top: 1.4rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .empty-state {
+            color: #8b97a8;
+            font-size: 1rem;
+            padding: 2.5rem 0;
+            text-align: center;
+            background: #fafbfc;
+            border-radius: 40px;
+            border: 1px dashed #dce2ec;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(10, 10, 14, 0.35);
+            backdrop-filter: blur(3px);
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            max-width: 600px;
+            width: 90%;
+            border-radius: 40px;
+            padding: 2.5rem 2.8rem;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.2);
+            position: relative;
+            animation: modalFade 0.25s ease;
+        }
+
+        @keyframes modalFade {
+            from { opacity: 0; transform: scale(0.96) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px; right: 22px;
+            font-size: 2rem;
+            line-height: 1;
+            cursor: pointer;
+            color: #a0aaba;
+            transition: 0.2s;
+            background: none;
+            border: none;
+        }
+
+        .modal-close:hover { color: #1a1a1e; }
+
+        .modal h2 {
+            font-weight: 300;
+            font-size: 1.8rem;
+            margin-bottom: 1.8rem;
+            border-bottom: 1px solid #eef2f7;
+            padding-bottom: 0.8rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.4rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #6b7a8f;
+            margin-bottom: 4px;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 1rem;
+            background: #fafbfc;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #d4af37;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.08);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .form-row .form-group { flex: 1; min-width: 140px; }
+
+        .btn-submit {
+            width: 100%;
+            padding: 0.9rem;
+            border: none;
+            background: #1a1a1e;
+            color: white;
+            border-radius: 60px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-submit:hover {
+            background: #b8962e;
+            box-shadow: 0 8px 24px rgba(184, 150, 46, 0.25);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1a1a1e;
+            color: white;
+            padding: 1rem 2.8rem;
+            border-radius: 60px;
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+            z-index: 1000;
+            border: 1px solid #d4af37;
+            white-space: nowrap;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast strong {
+            color: #d4af37;
+            font-weight: 500;
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 1.2rem; }
+            .modal { padding: 2rem 1.5rem; }
+            .actions-grid .btn { flex: 1 0 auto; }
+            .toast { white-space: normal; width: 90%; text-align: center; font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div class="logo">
+        ad.<span>почта</span>
+        <span class="premium-badge">премиум</span>
+    </div>
+
+    <div class="actions-grid">
+        <button class="btn btn-primary" id="btnOrder">📦 Заказать</button>
+        <button class="btn btn-outline-gold" id="btnSend">✉️ Отправить</button>
+        <button class="btn" id="btnTrack">📍 Отследить посылку</button>
+        <button class="btn" id="btnAgreement">📄 Соглашение</button>
+        <button class="btn btn-danger btn-sm" id="btnCancelOrder">↩️ Отменить заказ</button>
+        <button class="btn btn-danger btn-sm" id="btnCancelSend">↩️ Отменить отправку</button>
+    </div>
+
+    <h2 class="section-title">Оформленные заказы</h2>
+    <div id="ordersContainer" class="orders-grid">
+        <div class="empty-state">Нет активных заказов</div>
+    </div>
+
+    <h2 class="section-title">Отправленные письма и посылки</h2>
+    <div id="shipmentsContainer" class="shipments-grid">
+        <div class="empty-state">Нет отправлений</div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+</div>
+
+<!-- МОДАЛКА ЗАКАЗА -->
+<div id="orderModal" class="modal-overlay">
+    <div class="modal">
+        <button class="modal-close" id="closeOrderModal">&times;</button>
+        <h2>Оформление заказа</h2>
+        <form id="orderForm">
+            <div class="form-group">
+                <label>ФИО заказчика</label>
+                <input type="text" id="orderFio" placeholder="Иванов Иван Иванович" required>
+            </div>
+            <div class="form-group">
+                <label>Что заказать</label>
+                <input type="text" id="orderItem" placeholder="Например: Набор столовых приборов" required>
+            </div>
+            <div class="form-group">
+                <label>Комната доставки</label>
+                <input type="text" id="orderRoom" placeholder="каб. 304 / ауд. 12" required>
+            </div>
+            <div class="form-group">
+                <label>Количество</label>
+                <input type="number" id="orderQty" value="1" min="1" required>
+            </div>
+            <button type="submit" class="btn-submit">✅ Заказать</button>
+        </form>
+    </div>
+</div>
+
+<!-- МОДАЛКА ОТПРАВКИ -->
+<div id="sendModal" class="modal-overlay">
+    <div class="modal">
+        <button class="modal-close" id="closeSendModal">&times;</button>
+        <h2>Отправление письма / посылки</h2>
+        <form id="sendForm">
+            <div class="form-group">
+                <label>ФИО отправителя</label>
+                <input type="text" id="senderFio" placeholder="Петров Пётр Петрович" required>
+            </div>
+            <div class="form-group">
+                <label>ФИО получателя</label>
+                <input type="text" id="receiverFio" placeholder="Сидорова Анна Викторовна" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Тип товара</label>
+                    <select id="itemType" required>
+                        <option value="одежда">Одежда</option>
+                        <option value="игрушки">Игрушки</option>
+                        <option value="бытовая химия">Бытовая химия</option>
+                        <option value="для кухни">Для кухни</option>
+                        <option value="интерьер">Интерьер</option>
+                        <option value="бытовая техника">Бытовая техника</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Вид товара</label>
+                    <select id="itemVariant" required></select>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit">📤 Отправить</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    (function() {
+        'use strict';
+
+        // ВИДЫ ТОВАРОВ (БЕЗ КОСТЮМОВ)
+        const VARIANT_MAP = {
+            'одежда': ['Футболка', 'Джинсы', 'Платье', 'Куртка', 'Пальто', 'Свитер', 'Брюки', 'Юбка', 'Рубашка', 'Шорты', 'Обувь', 'Головной убор'],
+            'игрушки': ['Мягкая игрушка', 'Конструктор', 'Кукла', 'Машинка', 'Настольная игра', 'Робот', 'Пазл', 'Железная дорога', 'Плюшевый мишка', 'Кубики'],
+            'бытовая химия': ['Стиральный порошок', 'Средство для мытья посуды', 'Чистящий спрей', 'Отбеливатель', 'Кондиционер для белья', 'Средство для стекол', 'Средство для сантехники', 'Мыло жидкое', 'Гель для душа', 'Освежитель воздуха'],
+            'для кухни': ['Кастрюля', 'Сковорода', 'Набор ножей', 'Доска разделочная', 'Кружка', 'Тарелка', 'Столовый набор', 'Лопатка', 'Половник', 'Терка', 'Чайник', 'Кофеварка', 'Контейнер для хранения'],
+            'интерьер': ['Картина', 'Ваза', 'Настенные часы', 'Свеча', 'Плед', 'Подушка декоративная', 'Коврик', 'Светильник', 'Зеркало', 'Фигурка', 'Кашпо', 'Подставка'],
+            'бытовая техника': ['Холодильник', 'Стиральная машина', 'Телевизор', 'Пылесос', 'Микроволновая печь', 'Электрочайник', 'Блендер', 'Мясорубка', 'Утюг', 'Фен', 'Робот-пылесос', 'Посудомоечная машина', 'Кофемашина']
+        };
+
+        let orders = [];
+        let shipments = [];
+
+        function generateNumber(prefix = 'AД') {
+            const rand = Math.floor(1000 + Math.random() * 9000);
+            return prefix + '-' + rand;
+        }
+
+        function renderAll() {
+            renderOrders();
+            renderShipments();
+        }
+
+        function renderOrders() {
+            const container = document.getElementById('ordersContainer');
+            if (!orders.length) {
+                container.innerHTML = `<div class="empty-state">Нет активных заказов</div>`;
+                return;
+            }
+            container.innerHTML = orders.map((order, idx) => {
+                const statusClass = `status-${order.status}`;
+                let actionsHtml = '';
+
+                if (order.status === 'new') {
+                    actionsHtml = `<button class="btn btn-sm btn-outline-gold" data-action="collectOrder" data-idx="${idx}">✅ Собрать заказ</button>`;
+                } else if (order.status === 'collected') {
+                    actionsHtml = `<button class="btn btn-sm btn-outline-gold" data-action="shipOrder" data-idx="${idx}">🚚 Отправить заказ получателю</button>`;
+                } else if (order.status === 'shipped') {
+                    actionsHtml = `<button class="btn btn-sm btn-outline-gold" data-action="deliverOrder" data-idx="${idx}">📬 Заказ отдан получателю</button>`;
+                } else {
+                    actionsHtml = `<span style="font-size:0.8rem; color:#8b97a8;">Доставлен</span>`;
+                }
+
+                return `<div class="order-card">
+                    <div class="order-header">
+                        <span class="order-number">${order.number}</span>
+                        <span class="order-status ${statusClass}">${translateStatus(order.status)}</span>
+                    </div>
+                    <div class="order-detail"><strong>Заказчик:</strong> ${order.fio}</div>
+                    <div class="order-detail"><strong>Товар:</strong> ${order.item}</div>
+                    <div class="order-detail"><strong>Комната:</strong> ${order.room}</div>
+                    <div class="order-detail"><strong>Кол-во:</strong> ${order.qty}</div>
+                    <div class="order-actions">${actionsHtml}</div>
+                </div>`;
+            }).join('');
+
+            document.querySelectorAll('#ordersContainer [data-action]').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const action = this.dataset.action;
+                    const idx = parseInt(this.dataset.idx);
+                    if (action === 'collectOrder') {
+                        if (orders[idx]) orders[idx].status = 'collected';
+                    } else if (action === 'shipOrder') {
+                        if (orders[idx]) orders[idx].status = 'shipped';
+                    } else if (action === 'deliverOrder') {
+                        if (orders[idx]) orders[idx].status = 'delivered';
+                    }
+                    renderAll();
+                });
+            });
+        }
+
+        function renderShipments() {
+            const container = document.getElementById('shipmentsContainer');
+            if (!shipments.length) {
+                container.innerHTML = `<div class="empty-state">Нет отправлений</div>`;
+                return;
+            }
+            container.innerHTML = shipments.map((s, idx) => {
+                const statusClass = `status-${s.status}`;
+                let actionsHtml = '';
+                if (s.status === 'new') {
+                    actionsHtml = `<button class="btn btn-sm btn-outline-gold" data-action="shipSend" data-idx="${idx}">🚚 Отправить получателю</button>`;
+                } else if (s.status === 'shipped') {
+                    actionsHtml = `<button class="btn btn-sm btn-outline-gold" data-action="deliverSend" data-idx="${idx}">📬 Отдано получателю</button>`;
+                } else {
+                    actionsHtml = `<span style="font-size:0.8rem; color:#8b97a8;">Доставлено</span>`;
+                }
+                return `<div class="shipment-card">
+                    <div class="shipment-header">
+                        <span class="shipment-number">${s.number}</span>
+                        <span class="shipment-status ${statusClass}">${translateStatus(s.status)}</span>
+                    </div>
+                    <div class="order-detail"><strong>Отправитель:</strong> ${s.sender}</div>
+                    <div class="order-detail"><strong>Получатель:</strong> ${s.receiver}</div>
+                    <div class="order-detail"><strong>Тип:</strong> ${s.type}</div>
+                    <div class="order-detail"><strong>Вид:</strong> ${s.variant}</div>
+                    <div class="order-actions">${actionsHtml}</div>
+                </div>`;
+            }).join('');
+
+            document.querySelectorAll('#shipmentsContainer [data-action]').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const action = this.dataset.action;
+                    const idx = parseInt(this.dataset.idx);
+                    if (action === 'shipSend') {
+                        if (shipments[idx]) shipments[idx].status = 'shipped';
+                    } else if (action === 'deliverSend') {
+                        if (shipments[idx]) shipments[idx].status = 'delivered';
+                    }
+                    renderAll();
+                });
+            });
+        }
+
+        function translateStatus(status) {
+            const map = {
+                'new': 'Новый',
+                'collected': 'Собран',
+                'shipped': 'В пути',
+                'delivered': 'Доставлен'
+            };
+            return map[status] || status;
+        }
+
+        let toastTimer = null;
+        function showToast(number) {
+            const el = document.getElementById('toast');
+            el.innerHTML = `🔔 Номер заказа: <strong>${number}</strong>`;
+            el.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                el.classList.remove('show');
+            }, 5000);
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function populateVariants() {
+            const typeSelect = document.getElementById('itemType');
+            const variantSelect = document.getElementById('itemVariant');
+            function updateVariants() {
+                const type = typeSelect.value;
+                const variants = VARIANT_MAP[type] || ['—'];
+                variantSelect.innerHTML = variants.map(v => `<option value="${v}">${v}</option>`).join('');
+            }
+            typeSelect.addEventListener('change', updateVariants);
+            updateVariants();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+
+            document.getElementById('btnOrder').addEventListener('click', () => openModal('orderModal'));
+            document.getElementById('closeOrderModal').addEventListener('click', () => closeModal('orderModal'));
+            document.getElementById('orderModal').addEventListener('click', function(e) {
+                if (e.target === this) closeModal('orderModal');
+            });
+
+            document.getElementById('btnSend').addEventListener('click', () => openModal('sendModal'));
+            document.getElementById('closeSendModal').addEventListener('click', () => closeModal('sendModal'));
+            document.getElementById('sendModal').addEventListener('click', function(e) {
+                if (e.target === this) closeModal('sendModal');
+            });
+
+            document.getElementById('orderForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const fio = document.getElementById('orderFio').value.trim();
+                const item = document.getElementById('orderItem').value.trim();
+                const room = document.getElementById('orderRoom').value.trim();
+                const qty = parseInt(document.getElementById('orderQty').value) || 1;
+
+                if (!fio || !item || !room) return alert('Заполните все поля');
+
+                const number = generateNumber('AД');
+                orders.push({
+                    id: Date.now(),
+                    fio,
+                    item,
+                    room,
+                    qty,
+                    number,
+                    status: 'new'
+                });
+
+                showToast(number);
+                renderAll();
+                this.reset();
+                closeModal('orderModal');
+            });
+
+            document.getElementById('sendForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const sender = document.getElementById('senderFio').value.trim();
+                const receiver = document.getElementById('receiverFio').value.trim();
+                const type = document.getElementById('itemType').value;
+                const variant = document.getElementById('itemVariant').value;
+
+                if (!sender || !receiver) return alert('Заполните ФИО отправителя и получателя');
+
+                const number = generateNumber('AД');
+                shipments.push({
+                    id: Date.now(),
+                    sender,
+                    receiver,
+                    type,
+                    variant,
+                    number,
+                    status: 'new'
+                });
+
+                showToast(number);
+                renderAll();
+                this.reset();
+                closeModal('sendModal');
+                populateVariants();
+            });
+
+            document.getElementById('btnTrack').addEventListener('click', function() {
+                const lastOrder = orders.length ? orders[orders.length-1] : null;
+                const lastShip = shipments.length ? shipments[shipments.length-1] : null;
+                let msg = '📍 Отслеживание посылки\n\n';
+                if (lastOrder) {
+                    msg += `Последний заказ: ${lastOrder.number} — статус: ${translateStatus(lastOrder.status)}\n`;
+                }
+                if (lastShip) {
+                    msg += `Последнее отправление: ${lastShip.number} — статус: ${translateStatus(lastShip.status)}\n`;
+                }
+                if (!lastOrder && !lastShip) {
+                    msg += 'Нет активных отправлений.';
+                }
+                alert(msg);
+            });
+
+            document.getElementById('btnAgreement').addEventListener('click', function() {
+                alert(
+                    '📄 СОГЛАШЕНИЕ AD.ПОЧТА\n\n' +
+                    '1. Общие положения\n' +
+                    '   Настоящее соглашение регулирует отношения между AD.Почта и пользователем.\n\n' +
+                    '2. Условия доставки\n' +
+                    '   • Срок доставки — от 1 до 3 рабочих дней.\n' +
+                    '   • Ответственность за сохранность товара несёт AD.Почта.\n' +
+                    '   • В случае утери — полная компенсация стоимости.\n\n' +
+                    '3. Права и обязанности\n' +
+                    '   • Заказчик обязуется предоставить точные данные.\n' +
+                    '   • AD.Почта гарантирует конфиденциальность.\n' +
+                    '   • Отмена заказа возможна до момента отправки.\n\n' +
+                    '4. Ответственность\n' +
+                    '   • За нарушение сроков — штраф в размере 10% от стоимости.\n' +
+                    '   • Споры решаются в соответствии с законодательством.\n\n' +
+                    '© 2026 AD.Почта — Премиум сервис доставки.'
+                );
+            });
+
+            document.getElementById('btnCancelOrder').addEventListener('click', function() {
+                if (!orders.length) return alert('Нет заказов для отмены.');
+                const last = orders[orders.length-1];
+                if (last.status === 'delivered') return alert('Заказ уже доставлен, отмена невозможна.');
+                orders.pop();
+                renderAll();
+                alert('Последний заказ отменён.');
+            });
+
+            document.getElementById('btnCancelSend').addEventListener('click', function() {
+                if (!shipments.length) return alert('Нет отправлений для отмены.');
+                const last = shipments[shipments.length-1];
+                if (last.status === 'delivered') return alert('Отправление уже доставлено, отмена невозможна.');
+                shipments.pop();
+                renderAll();
+                alert('Последнее отправление отменено.');
+            });
+
+            populateVariants();
+            renderAll();
+        });
+
+    })();
+</script>
+
+</body>
+</html>
